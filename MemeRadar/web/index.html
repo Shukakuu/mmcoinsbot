@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MemeRadar — Veille Solana</title><link rel="stylesheet" href="/v8.css"><script defer src="/v8.js"></script></head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">M</div><div><b>MemeRadar</b><span>INTELLIGENCE · SOLANA</span></div></div>
+    <nav aria-label="Navigation"><button class="nav active" data-jump="top">◉ <span>Vue d’ensemble</span></button><button class="nav" data-jump="tokens">▤ <span>Tokens</span></button><button class="nav" data-jump="narratives">⌁ <span>Narratives</span></button><button class="nav" data-jump="research">⌗ <span>Mesures</span></button></nav>
+    <div class="side-bottom"><span class="signal-dot" id="healthDot"></span><span id="healthText">Connexion…</span><div class="side-caption">Lecture seule · aucune transaction</div></div>
+  </aside>
+  <main id="top">
+    <header class="top"><div><div class="eyebrow">DÉCOUVERTE EN CONTINU</div><h1>Market overview <span class="version">V8.1</span></h1><p>De l’événement J7 au lancement Solana, avec risques visibles.</p></div><div class="top-actions"><span id="updateAt">—</span><button id="refresh" class="action">↻ Actualiser le scan</button><button id="restart" class="action">Relancer les services</button></div></header>
+    <div class="notice">Les mots surlignés et les coins associés sont des hypothèses. Aucune narrative, aucun score et aucun prix indicatif ne garantissent une hausse ou une revente possible.</div>
+    <section class="kpis" aria-label="Indicateurs">
+      <article class="kpi"><span>Nouveaux lancements enregistrés</span><strong id="kLaunches">—</strong><small>Flux natif, avant cotation DEX</small></article>
+      <article class="kpi"><span>Correspondances narratives</span><strong id="kMatches">—</strong><small>Association de thème non officielle</small></article>
+      <article class="kpi"><span>Tokens cotés</span><strong id="kQuoted">—</strong><small>DEX ultérieur, USD observable</small></article>
+      <article class="kpi"><span>En cours de suivi</span><strong id="kFollow">—</strong><small>Tokens thématiques + témoins</small></article>
+    </section>
+    <section class="columns" id="narratives">
+      <article class="panel"><div class="panel-head"><div><h2>Mots en veille <span class="soft-tag">J7</span></h2><p>Expressions repérées dans les publications réellement reçues.</p></div><small id="j7State">J7 : en attente</small></div><div id="themes" class="terms"><div class="empty-small">Aucune narrative récente.</div></div><details class="mini-disclose"><summary>Dernières publications J7 reçues</summary><div id="recentPosts" class="recent-posts">Aucune publication reçue.</div></details><p class="sub-note">Le compte auteur est conservé, sans supposer qu’il soutient un token.</p></article>
+      <article class="panel"><div class="panel-head"><div><h2>Créations reliées</h2><p>Repérées dès le lancement, même sans prix DEX.</p></div><small id="launchState">Flux : en attente</small></div><div id="liveLaunches" class="live-list"><div class="empty-small">En attente des nouveaux lancements.</div></div></article>
+    </section>
+    <section class="panel tokens" id="tokens"><div class="panel-head"><div><h2>Tokens suivis</h2><p>Les informations non vérifiées restent explicitement indiquées.</p></div><a href="/api/export" class="plain-link">Exporter CSV ↗</a></div>
+    <div class="filters"><input id="search" type="search" placeholder="Rechercher un coin, ticker ou mint…" aria-label="Rechercher"><select id="status" aria-label="Statut"><option value="all">Tous les statuts</option><option value="a_etudier">À étudier</option><option value="surveillance">Surveillance</option><option value="incomplet">Incomplets</option><option value="risque">Risques</option><option value="expire">Expirés</option></select><select id="minScore" aria-label="Score minimal"><option value="0">Tous les scores / non cotés</option><option value="40" selected>Score ≥ 40</option><option value="65">Score ≥ 65</option></select><select id="sort" aria-label="Trier"><option value="recent">Plus récents</option><option value="signal">Avec signal J7</option><option value="attention">À surveiller</option></select></div>
+    <div class="table-scroll"><table class="coins-table"><thead><tr><th>Token</th><th>Statut</th><th>Prix USD</th><th>Cap. initiale SOL</th><th>Variation 5 min</th><th>Observé</th><th>Action</th></tr></thead><tbody id="coinRows"><tr><td colspan="7" class="empty-small">Chargement…</td></tr></tbody></table></div><div id="count" class="table-foot">—</div></section>
+    <section class="panel measures" id="research"><div class="panel-head"><div><h2>Mesure des signaux J7</h2><p>Comparaison prospective avec les lancements témoins. Résultats non exécutables.</p></div><select id="horizon" aria-label="Horizon de mesure"><option value="300">5 min</option><option value="600">10 min</option><option value="1200">20 min</option><option value="3600">1 h</option><option value="10800">3 h</option><option value="21600">6 h</option></select><small id="researchHealth">En attente de données.</small></div><div class="comparison"><div><span>Tokens reliés à une narrative</span><strong id="cmpMatch">—</strong><small id="cmpMatchN">— mesures</small></div><div><span>Tokens témoins indépendants</span><strong id="cmpControl">—</strong><small id="cmpControlN">— mesures</small></div></div><p class="sub-note" id="comparisonNote">Référence : prix observé après 30 s. Cotation manquante = résultat non mesuré. Liquidité, frais et possibilité de vente non validés.</p></section>
+    <details class="panel diagnostic"><summary>Auteurs, copies possibles et wallets</summary><div id="intelligence">En attente…</div></details>
+    <details class="panel diagnostic"><summary>Sources et diagnostics techniques</summary><div id="diagnostics">En attente des services…</div></details>
+    <footer>V8.1 · Observations, pas recommandations. Une hausse affichée n’est pas un bénéfice réalisé. Interface liée à 127.0.0.1 uniquement.</footer>
+  </main>
+</div>
+<div class="veil hidden" id="veil"><section class="details" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><div class="detail-head"><div><small>FICHE DU TOKEN</small><h2 id="detailTitle">—</h2></div><button id="closeDetail" class="close" aria-label="Fermer">×</button></div><div id="detailContent"></div></section></div>
+</body></html>

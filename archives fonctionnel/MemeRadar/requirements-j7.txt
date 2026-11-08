@@ -1,0 +1,2 @@
+# Optional: required only for the J7Tracker live social feed.
+python-socketio[client]>=5.11,<6

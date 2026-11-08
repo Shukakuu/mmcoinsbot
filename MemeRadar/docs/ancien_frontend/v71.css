@@ -1,0 +1,42 @@
+/* MemeRadar 7.1 — restrained dark terminal, no external assets. */
+:root{--bg:#0a0c10;--side:#0b0e12;--panel:#11151b;--panel2:#121820;--stroke:#252c36;--text:#edf1f5;--muted:#8c98a7;--bright:#c9d8e7;--violet:#9cb9da;--mint:#76cfa9;--red:#f29ca0;--amber:#eac28f}
+body{font-family:Inter,'Segoe UI',system-ui,sans-serif;background:#0a0c10;color:#edf1f5;font-size:13px}
+.shell{grid-template-columns:190px minmax(0,1fr)}
+.sidebar{padding:28px 18px;background:#0c1015;border-right:1px solid #242b33}
+.logo{font-size:19px;margin-bottom:44px}.logo-mark{background:#1e2c3b;color:#bed4e9;box-shadow:none;border:1px solid #32475e;border-radius:10px;width:34px;height:34px;font-size:21px}
+.logo span:not(.logo-mark){color:#f1f4f8}.logo small{color:#768596;letter-spacing:1.5px;font-size:9px}
+.nav-item{border-radius:7px;padding:11px 10px;font-size:12px;font-weight:550;color:#98a3b2}.nav-item.selected{background:#1b2633;border:1px solid #2c3c4c;color:#dee9f5}
+.section-label,.bottom-brand,.breadcrumbs,.eyebrow{color:#778696;letter-spacing:1.1px}
+.sidebar-note{background:#111922;border:1px solid #283644;border-radius:9px;padding:13px}.sidebar-note p{color:#8292a1}.bottom-brand{font-size:9px}
+.main{padding-top:27px}
+.topline{margin-bottom:20px}
+.intro{margin-bottom:20px;gap:16px}.intro h1{font-size:28px;line-height:1.15;margin:4px 0 8px;letter-spacing:-1.1px;font-weight:780}.intro h1 em{font-style:normal;color:#a5c2dc}.intro p{font-size:12px;color:#8f9da9;margin:0}
+.button-strong{background:#d9e5ef;color:#101720;border:1px solid #d9e5ef;box-shadow:none;font-size:12px}.button-strong:hover{background:#fff;color:#101720;filter:none}
+.outline-button,.reset-filters{background:#131b23;border:1px solid #32404e;color:#ced9e4;border-radius:8px;font-size:12px}
+.scan-panel{background:#121821;border-color:#283542;padding:15px 17px;margin-bottom:12px;border-radius:10px;box-shadow:none}
+.scan-animation{background:#1b2632;border:1px solid #334454;color:#b7cbdc;width:35px;height:35px;font-size:21px;border-radius:8px}
+.scan-panel.is-scanning{border-color:#48657a}.scan-panel.is-scanning .scan-animation{border-color:#5b7b91;box-shadow:none;color:#cfe4f6}
+.scan-summary strong{font-size:14px;color:#e6edf3}.scan-summary p{color:#8a98a8}.scan-cycle{background:#1b2530;border-color:#344656;color:#b5ccde}
+.scan-track{height:3px;background:#253240;margin:12px 0 9px}.scan-track-fill{background:#7caacb}.scan-panel.is-scanning .scan-track-fill{background:#9cc4da}
+.scan-telemetry span{color:#758596}.scan-telemetry strong{color:#c5d1db}
+.source-line{margin:10px 0 16px;color:#8091a0;gap:12px;font-size:11px}
+.metrics{gap:11px;margin-bottom:24px}.metric{background:#12171e;border:1px solid #272f39;border-radius:10px;padding:15px}.metric strong{font-size:25px}.metric small{color:#708090}
+.content-heading h2{font-size:18px}.content-heading p{color:#8493a2}
+.controls{background:transparent;border:0;padding:0;margin-bottom:10px}.controls input,.controls select{background:#131921;border-color:#2c3744;color:#dee7f0}
+.table-wrap{background:#10151b;border-color:#27313d;border-radius:10px}.table-head{background:#151d25;color:#748697;font-size:10px}.coin-row{background:#11171f;border-bottom-color:#212c36;color:#e4ebf1}.coin-row:hover{background:#1a2531}.coin-avatar{background:#1d2e3f;color:#bed2e2;border-color:#344d63}.symbol{color:#eef3f6}.score{color:#d6e5f3}
+.pill{border-radius:5px}.pill.prewatch{background:#28261e;border-color:#554c32;color:#dbc99c}.pill.surveillance{background:#1b2a37;border-color:#325068;color:#b7d4ea}.pill.risque{background:#321e22;border-color:#633c43;color:#efb3b7}
+.signal-mini{color:#98b6c7}.tiny{color:#83919f}
+.axiom-inline{display:inline-block;margin-top:4px;border:1px solid #3b536a;border-radius:5px;padding:3px 7px;color:#b8d8ee;text-decoration:none;font-size:10px;font-weight:750;white-space:nowrap}.axiom-inline:hover{background:#2a3f50;color:white}
+.filters-drawer{margin:7px 0 10px}.filters-drawer>summary{padding:10px 4px;cursor:pointer;color:#9eacb9;font-size:12px;list-style:disclosure-closed}.filters-drawer[open]>summary{list-style:disclosure-open}.filters-drawer>summary span{float:right;color:#6f7f8e}
+.quality-filters{background:#121820;border-color:#293744;padding:12px;margin:5px 0 0}.quality-score-heading strong{color:#bed2e2}.quality-score input[type=range]{background:#2b3c48}.quality-score input[type=range]::-webkit-slider-thumb{background:#c1d4e3;border-color:#56778d;box-shadow:none}
+.quality-toggle,.quality-coverage{color:#a3b2c1}.quality-toggle input{accent-color:#9bbfd7}.quality-coverage select{background:#151d25;color:#d2dce6;border-color:#304252}
+.social-drawer{background:#10151b;border-color:#2a3541;margin-top:15px}.social-drawer>summary{color:#b7c9d9;padding:14px}.social-panel{background:#111820;border-color:#293845}.social-post{background:#18212b;border-color:#324151}.social-post-head strong{color:#e7f1f9}.social-post p{color:#c3d1dd}.social-meta a{color:#9cc9e5}.social-tab{background:#1c2530;border-color:#354555;color:#b5c5d3}.social-tab.selected{background:#2f516a;border-color:#638bac}.social-live{background:#182b32;border-color:#365158;color:#b9dbd1}.account-chip{background:#26313c}
+.modal{background:#111820;border:1px solid #34404c}.detail-stat{background:#18212a;border-color:#293744}.details-section{border-top-color:#293844}.details-section h3{color:#e1ebf3}.modal-note,.stale-warning{background:#29271f;border-color:#514731;color:#e7d0a7}.pattern{background:#1a2835;border-color:#3c5267}.pattern strong{color:#c0d7ea}.pattern small{color:#9bb4c8}
+.narrative-ribbon{background:#111820;border:1px solid #293744;border-radius:10px;padding:14px 16px;margin:0 0 15px}
+.ribbon-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:11px}.ribbon-head h2{font-size:16px;letter-spacing:-.3px;margin:3px 0 0}.ribbon-head small{color:#778b9d;font-size:11px}
+.ribbon-terms{display:flex;flex-wrap:wrap;gap:7px;min-height:36px}.narrative-chip{padding:7px 9px;border:1px solid #354657;background:#192530;border-radius:7px;font-size:11px;font-weight:750;color:#d5e7f4;line-height:1.25}.narrative-chip small{display:block;font-size:9px;font-weight:400;color:#879fb2;margin-top:3px}
+.ribbon-placeholder{font-size:12px;color:#8493a1;padding:8px 0}.ribbon-bottom{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;color:#8393a2;font-size:10px}
+@media(max-width:1130px){.shell{grid-template-columns:minmax(0,1fr)}.sidebar{display:none}}
+@media(max-width:740px){.ribbon-head{display:block}.ribbon-head small{display:block;margin-top:4px}.metrics{gap:8px}.metric{padding:12px}.intro h1{font-size:25px}.narrative-ribbon{padding:12px}}
+
+.social-theme{font-size:10px;background:#21313b;border:1px solid #345268;color:#b8d8e8;border-radius:5px;padding:4px 6px}.social-theme::before{content:'◦ ';opacity:.65}

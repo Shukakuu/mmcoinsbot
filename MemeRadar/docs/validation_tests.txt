@@ -1,0 +1,16 @@
+127.0.0.1 - - [07/Nov/2026 14:03:11] "GET /api/intelligence HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2026 14:03:11] "GET /api/evaluation?horizon=21600 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2026 14:03:11] "GET /api/evaluation?horizon=999 HTTP/1.1" 400 -
+127.0.0.1 - - [07/Nov/2026 14:03:11] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2026 14:03:11] "GET /v8.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2026 14:03:11] "POST /api/refresh HTTP/1.1" 202 -
+127.0.0.1 - - [07/Nov/2026 14:03:11] "POST /api/refresh HTTP/1.1" 409 -
+127.0.0.1 - - [07/Nov/2026 14:03:12] "GET /api/export HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2026 14:03:14] "POST /api/restart HTTP/1.1" 403 -
+127.0.0.1 - - [07/Nov/2026 14:03:14] "POST /api/restart HTTP/1.1" 202 -
+127.0.0.1 - - [07/Nov/2026 14:03:14] "POST /api/restart HTTP/1.1" 409 -
+127.0.0.1 - - [07/Nov/2026 14:03:15] "POST /api/restart HTTP/1.1" 403 -
+----------------------------------------------------------------------
+Ran 223 tests in 5.073s
+
+OK

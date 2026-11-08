@@ -1,0 +1,13 @@
+# Local data, logs, secrets and generated files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+.env.*
+*.log
+.DS_Store
+wallets.txt

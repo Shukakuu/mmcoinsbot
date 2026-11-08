@@ -1,0 +1,172 @@
+[
+  {
+    "path": "AUDIT_V8_1.md",
+    "change": "added",
+    "sha256": "4fc84eb6d0610476ae8f122d1f6698423fac44620a9842dd49b8d728cb27338d"
+  },
+  {
+    "path": "README.md",
+    "change": "modified",
+    "sha256": "56caa1748367d8af7d5ad74c935599e4f123244ba5407829f8c48fc803eb2866"
+  },
+  {
+    "path": "START_J7.ps1",
+    "change": "modified",
+    "sha256": "ba96947136cc94da906d234e915428e3ad477281ec90a9f7aaa65f9f98febb06"
+  },
+  {
+    "path": "START_MEMERADAR.bat",
+    "change": "modified",
+    "sha256": "15e5ef0b2e7c96985df0b20efff86e34222485211349d5d46c24c2032c1fe913"
+  },
+  {
+    "path": "START_V8.bat",
+    "change": "modified",
+    "sha256": "e768b5eb45fe6dcc3e09dbadd6abd267c4e5cadafec01fde3f404bed2afebef2"
+  },
+  {
+    "path": "docs/validation_tests.txt",
+    "change": "added",
+    "sha256": "1e6fd1f161686989a0f7705062756e974a50bc1ccb4a20c6b17ef740e51588de"
+  },
+  {
+    "path": "main.py",
+    "change": "modified",
+    "sha256": "19a980e36938f2e37ab63d07218ce088ce0234a14f9b0ec3b7945c97aa85ddaf"
+  },
+  {
+    "path": "radar/curve.py",
+    "change": "modified",
+    "sha256": "bd0490ef95635013b4e249ecc68c0952e8935847639d22e140d7a9762e95e895"
+  },
+  {
+    "path": "radar/engine.py",
+    "change": "modified",
+    "sha256": "4ffae08e7d4133d7e21121a3ca1027edde6259f07c612b40030d80ff4f6bf4d9"
+  },
+  {
+    "path": "radar/fast_lane.py",
+    "change": "modified",
+    "sha256": "167b41028babd6993b48aa05714732a2e3ef2747b2b7137d8ccfeab22a3a7e90"
+  },
+  {
+    "path": "radar/intelligence.py",
+    "change": "added",
+    "sha256": "242c3fd76d4855023eb03760c1096418f94d8aaaff05ef159206f65e6aaaf80a"
+  },
+  {
+    "path": "radar/j7_hub.py",
+    "change": "modified",
+    "sha256": "70accc1a3d6680c15d5bfff9e6132e9aa63cb0b3c91994c727c0138e6fdd022c"
+  },
+  {
+    "path": "radar/live_launches.py",
+    "change": "modified",
+    "sha256": "e9643c08ebd15f2400f1d591261f5ac69ca84e660081c1f4bc4bc309685425cf"
+  },
+  {
+    "path": "radar/onchain_risk.py",
+    "change": "modified",
+    "sha256": "52f677e154cbbbf533387a9b00b922da502c43b6f7722405da2807c0f2d95a45"
+  },
+  {
+    "path": "radar/providers.py",
+    "change": "modified",
+    "sha256": "b2a6fc14d3baf8350be5bbaf9c7966b18c630d7ceb5de9bc236529392d8ecb0a"
+  },
+  {
+    "path": "radar/realtime.py",
+    "change": "modified",
+    "sha256": "503dda29a40cf8279e83586f13a663ee34e2cb53772b2ff7f01e5adf9d97ad3e"
+  },
+  {
+    "path": "radar/scoring.py",
+    "change": "modified",
+    "sha256": "2c22126cd8057e462ee137fd2703733fa2d62d3197398f97be4e08db850d91a0"
+  },
+  {
+    "path": "radar/selection.py",
+    "change": "modified",
+    "sha256": "9c3f870fdc1a12953e69b0e1a9743fa6e4aafd0f78d17446f4a2d0f842aa7eea"
+  },
+  {
+    "path": "radar/social.py",
+    "change": "modified",
+    "sha256": "2281150d2c98b2cab5b4fbe5b19f5079f53ece00bcb738deb5778b485625af3f"
+  },
+  {
+    "path": "radar/source_scanner.py",
+    "change": "modified",
+    "sha256": "9f6a3de5ce48068864e78d260f03deb2f4b4d4c1bef7da4824ece9bdb47a2d3f"
+  },
+  {
+    "path": "radar/store.py",
+    "change": "modified",
+    "sha256": "d4bb98301b73b7eb225ed2d142c7231e41194e57243ad0629c0ebef0b0ab4779"
+  },
+  {
+    "path": "requirements-j7.txt",
+    "change": "modified",
+    "sha256": "ed95c60c4150d28f335e5f269051238840a946ccf8d6d7cd1de8ebebb7dce5b9"
+  },
+  {
+    "path": "tests/test_http_v81.py",
+    "change": "added",
+    "sha256": "2a0e7a07e480746fe754da7cf2cd6c6bf166a81bbbf437887059ae183338fc90"
+  },
+  {
+    "path": "tests/test_realtime_v8.py",
+    "change": "modified",
+    "sha256": "f4fbb343fd72d3c534898bccea8d9753c2234b0b21bccbc70fc2e2db51cbd311"
+  },
+  {
+    "path": "tests/test_v691.py",
+    "change": "modified",
+    "sha256": "964213cf22da447092271abf59aaf69308b471e2a6e2f6f8da8ead4c9f64ebd0"
+  },
+  {
+    "path": "tests/test_v72.py",
+    "change": "modified",
+    "sha256": "62e01cb9979c68c17f12946fec53d09d52c7dead6899b8d94cd4511f063768fa"
+  },
+  {
+    "path": "tests/test_v81.py",
+    "change": "added",
+    "sha256": "049aa360a8860aeccd6cfcdaca6b66e6e0c342501ae24982ee678de16d0dab61"
+  },
+  {
+    "path": "tools/benchmark_view.py",
+    "change": "added",
+    "sha256": "2c8d7f4e3c7fcfa32adcc0939ef43ed1dd5ebf3ecbcb01c3c411844520f149ef"
+  },
+  {
+    "path": "wallets.txt",
+    "change": "modified",
+    "sha256": "3efb4830010b94997eb83eeb2884d12c60b48698b60323dba42dbd7c070eda02"
+  },
+  {
+    "path": "wallets_all.txt",
+    "change": "added",
+    "sha256": "32330d20ca29b785f849112aad2e895e101fdd79a8fdd2fb22563f204ab0bdd4"
+  },
+  {
+    "path": "wallets_registry.json",
+    "change": "added",
+    "sha256": "ef766f07a1ccbffbaff18aead51ae43f1b5ebcf3cc99cd7574d9e35dc03e76a9"
+  },
+  {
+    "path": "web/index.html",
+    "change": "modified",
+    "sha256": "f1d9dfa63074431e81008f5674b5efbbbd22d98344fbcf36b607ddf439915413"
+  },
+  {
+    "path": "web/v8.css",
+    "change": "modified",
+    "sha256": "d8692b19597597a5e37258325a00c89a839dff7b6a0745b929ec07d02fbd7d24"
+  },
+  {
+    "path": "web/v8.js",
+    "change": "modified",
+    "sha256": "01b2969f303a9de6b9396d098b6ca1be4e7b787b4a29d52fde7a97ade6eddf80"
+  }
+]

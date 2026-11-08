@@ -1,0 +1,14 @@
+/* MemeRadar 7.2 — panneau J7 (sombre, sans ressource externe). */
+.j7-panel{background:#11171f;border:1px solid #2b3b4b;border-radius:10px;padding:14px 16px;margin:0 0 14px}
+.j7-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:10px}
+.j7-head h2{margin:2px 0 0;font-size:16px}.j7-head small{color:#8091a0;font-size:11px;text-align:right}
+.j7-table-wrap{overflow-x:auto;max-height:330px;overflow-y:auto;margin-bottom:8px}
+.j7-table{width:100%;border-collapse:collapse;font-size:12px}
+.j7-table th{position:sticky;top:0;background:#151d25;color:#748697;font-size:10px;font-weight:650;letter-spacing:.6px;text-align:left;padding:7px 8px;white-space:nowrap}
+.j7-table td{padding:7px 8px;border-bottom:1px solid #212c36;color:#dbe4ec;vertical-align:top}
+.j7-table tr:hover td{background:#17212b}
+.j7-table .up{color:#76cfa9}.j7-table .down{color:#f29ca0}
+.j7-mint{font-size:11px;color:#9cb9da;cursor:copy}
+.j7-more{margin-top:6px}.j7-more>summary{cursor:pointer;color:#9eacb9;font-size:12px;padding:6px 0}.j7-more>summary span{float:right;color:#6f7f8e}
+.pill.j7o{background:#1a2733;border:1px solid #365571;color:#b9d6ee}
+@media (max-width:760px){.j7-head{flex-direction:column;align-items:flex-start}.j7-head small{text-align:left}}

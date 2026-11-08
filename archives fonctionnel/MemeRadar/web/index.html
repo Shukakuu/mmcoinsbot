@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MemeRadar v6.5 — Détection renforcée + J7</title>
+<link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script><script src="/social.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="logo"><span class="logo-mark">✧</span><div>Meme<span>Radar</span><small>RESEARCH TERMINAL</small></div></div>
+    <div class="section-label">ESPACE DE TRAVAIL</div>
+    <div class="nav-item selected">◈ &nbsp; Radar des tokens</div>
+    <a class="nav-item nav-link" href="#socialDrawer">◉ &nbsp; Veille sociale J7</a>
+    <div class="nav-item">◷ &nbsp; Historique en direct</div>
+    <div class="side-spacer"></div>
+    <div class="sidebar-note"><b>100 % observation</b><p>Aucune connexion à un wallet. Aucun ordre d'achat ou de vente.</p></div>
+    <div class="bottom-brand">SOLANA · RECHERCHE</div>
+  </aside>
+  <main class="main">
+    <div class="topline"><div class="breadcrumbs">TABLEAU DE BORD <span>/</span> SCANNER</div>
+      <div class="system"><span class="signal-dot" id="signalDot"></span><span id="systemText">Connexion…</span></div></div>
+    <div class="intro"><div><div class="eyebrow">SOLANA / TOKEN INTELLIGENCE</div><h1>Repère les signaux.<br><em>Décide toi-même.</em></h1>
+      <p>Découverte des pools, sécurité, surveillance des wallets et mentions sociales J7 en direct.</p></div>
+      <div class="radar-actions"><button class="button-strong" id="refreshButton">↻ &nbsp; Scanner maintenant</button>
+      <button type="button" class="outline-button restart-button" id="restartButton" title="Relance Python, le scanner et J7. Ne supprime pas l'historique.">⟳ Redémarrer les services</button></div>
+    </div>
+    <div id="demoBanner" class="demo-banner hidden">MODE DÉMO — Tous les tokens et prix affichés sont fictifs. Aucune recommandation réelle.</div>
+    <section class="scan-panel" id="scanPanel" aria-label="État des mises à jour du scanner">
+      <div class="scan-panel-head">
+        <div class="scan-animation" id="scanAnimation" aria-hidden="true">↻</div>
+        <div class="scan-summary">
+          <div class="scan-eyebrow">SURVEILLANCE AUTOMATIQUE</div>
+          <strong id="scanTitle" role="status" aria-live="polite">Connexion au scanner…</strong>
+          <p id="scanDetail">Récupération de l'état du bot.</p>
+        </div>
+        <div class="scan-cycle" id="scanCycle">Cycle —</div>
+      </div>
+      <div class="scan-track" role="progressbar" aria-label="Progression du scan ou délai avant le prochain" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="scanTrack">
+        <div class="scan-track-fill" id="scanProgress"></div>
+      </div>
+      <div class="scan-telemetry">
+        <div><span>DERNIER SCAN</span><strong id="scanLast">En attente</strong></div>
+        <div><span>PROCHAIN SCAN</span><strong id="scanNext">En attente</strong></div>
+        <div><span>INTERFACE ACTUALISÉE</span><strong id="scanFrontend">En attente</strong></div>
+      </div>
+      <div id="scanNotice" class="scan-notice hidden" role="status"></div>
+    </section>
+    <div class="source-line" aria-live="polite"><span id="j7Compact">J7 : connexion…</span><span id="geckoCompact">Gecko : en attente</span></div>
+    <section class="metrics"><div class="metric"><span>TOKENS SUIVIS</span><strong id="statTotal">—</strong><small>Historique conservé · actifs récents visibles</small></div>
+      <div class="metric"><span>À ÉTUDIER</span><strong id="statInteresting" class="accent">—</strong><small>Score + preuves suffisantes</small></div>
+      <div class="metric"><span>DONNÉES INCOMPLÈTES</span><strong id="statIncomplete">—</strong><small>Contrôles encore manquants</small></div>
+      <div class="metric"><span>RISQUES IDENTIFIÉS</span><strong id="statRisky" class="danger">—</strong><small>Pas une sélection d'achat</small></div></section>
+
+    <div class="content-heading"><div><h2>Flux des candidats</h2><p id="lastScan">Dernier scan : en attente</p></div>
+    <a href="/api/export" class="outline-button" download="memeradar_signaux.csv">⇩ Export CSV</a></div>
+    <section class="controls"><div class="search-wrap">⌕ <input id="search" placeholder="Rechercher nom, ticker, adresse…" aria-label="Rechercher"></div>
+      <select id="filter" aria-label="Filtrer"><option value="all">Tous les statuts</option><option value="a_etudier">À étudier</option><option value="surveillance">Surveillance</option><option value="incomplet">Incomplets</option><option value="risque">À risque</option><option value="expire">Archives périmées</option><option value="signals">Avec signaux</option><option value="favorites">Favoris ☆</option></select>
+      <select id="sort" aria-label="Trier"><option value="rank">Priorité</option><option value="signals">Signaux détectés</option><option value="score">Score décroissant</option><option value="recent">Détectés récemment</option><option value="age">Paires les plus jeunes</option></select></section>
+    <section class="quality-filters" aria-label="Filtrage des candidats">
+      <div class="quality-score">
+        <div class="quality-score-heading"><label for="minimumScore">Note minimale</label><strong id="scoreThreshold">Score &gt; 40/100</strong></div>
+        <input type="range" id="minimumScore" min="0" max="90" step="5" value="40" aria-describedby="qualityHelp">
+        <div class="quality-range"><span>Tous</span><span>Très sélectif</span></div>
+      </div>
+      <label class="quality-toggle"><input id="hideStale" type="checkbox" checked><span>Masquer les coins périmés (&gt; 5 min)</span></label>
+      <label class="quality-toggle"><input id="hideRisks" type="checkbox" checked><span>Masquer les tokens à risque</span></label>
+      <label class="quality-toggle"><input id="withSignalsOnly" type="checkbox"><span>Exiger un signal détecté</span></label>
+      <label class="quality-coverage" for="minimumCoverage"><span>Preuves disponibles</span><select id="minimumCoverage" aria-label="Couverture minimale des preuves"><option value="0">Toutes</option><option value="50">≥ 50 %</option><option value="70">≥ 70 %</option><option value="90">≥ 90 %</option></select></label>
+      <button type="button" class="reset-filters" id="showAllButton">Tout afficher</button>
+    </section>
+    <div class="results-heading"><span id="visibleCount" aria-live="polite">0 token affiché</span><span id="qualityHelp">Le score n’est pas une probabilité de hausse.</span></div>
+    <div class="diagnostic-line" id="selectionDiagnostic" aria-live="polite">En attente des données du scanner.</div>
+    <div class="table-wrap"><div class="table-head"><span>COIN / STATUT</span><span>PRIX</span><span>LIQUIDITÉ / VOLUME 1H</span><span>5 MIN / ÂGE</span><span>ÉVOLUTION OBSERVÉE</span><span>SCORE</span></div>
+      <div id="coinList" class="coin-list"><div class="empty">En attente des premiers résultats…</div></div></div>
+    <details class="social-drawer" id="socialDrawer"><summary>◉ &nbsp; Diagnostics J7 et flux de tweets <span>Facultatif · J7 influence déjà la priorité des coins avec CA identifié</span></summary>
+    <section class="social-panel" id="socialPanel" aria-label="Publications X en direct via J7">
+      <div class="social-header"><div><div class="eyebrow">SOURCE J7 / X · EN DIRECT</div><h2>Veille sociale</h2>
+        <p>Les tweets reçus s'affichent même sans contrat. Mention ≠ prédiction de hausse.</p></div>
+        <div class="social-live" id="socialState"><span class="social-dot"></span> Connexion…</div>
+      </div>
+      <div class="social-stats" id="socialStats" aria-live="polite"><span>En attente des publications J7…</span></div>
+      <div class="social-controls">
+        <div class="social-tabs" role="group" aria-label="Type de publications">
+          <button type="button" data-j7-filter="relevant" class="social-tab selected" aria-pressed="true">Crypto / memecoins</button>
+          <button type="button" data-j7-filter="contracts" class="social-tab" aria-pressed="false">Avec contrat CA</button>
+          <button type="button" data-j7-filter="all" class="social-tab" aria-pressed="false">Tout le flux</button>
+        </div>
+        <label class="social-option"><input id="socialNoReplies" type="checkbox" checked> Masquer réponses / reposts</label>
+      </div>
+      <div class="social-help" id="socialHelp">Tweets J7 reçus ; seuls les contrats Solana validés déclenchent une analyse prioritaire.</div>
+      <div class="social-posts" id="socialPosts"><div class="social-empty">Connexion au flux…</div></div>
+      <p class="social-footer">« Gros compte » = nombre d'abonnés, pas fiabilité. Les tickers seuls ne sont jamais associés automatiquement à une adresse.</p>
+    </section>
+    </details>
+    <div id="warningBox" class="warning hidden"></div>
+    <div class="footnote">Scores heuristiques non calibrés : ce ne sont ni des probabilités de hausse ni des conseils d'achat. Les prix peuvent être retardés, manipulés ou inexécutables. Signaux descriptifs, pas des ordres d’achat. Âge = âge de la paire DEX.</div>
+  </main>
+</div>
+<div id="overlay" class="overlay hidden"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+  <div class="modal-top"><div><small>FICHE DE RECHERCHE · SOLANA</small><h2 id="detailTitle">Détails</h2></div><button id="closeModal" aria-label="Fermer">✕</button></div>
+  <div id="detailBody"></div></div></div>
+</body></html>

@@ -1,0 +1,5 @@
+# Optional: required only for the J7Tracker live social feed.
+python-socketio[client]>=5.11,<6
+
+# Flux public de créations/migrations PumpPortal (facultatif, clé API selon accès fournisseur)
+websocket-client>=1.7,<2
