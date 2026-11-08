@@ -64,8 +64,9 @@ from .research_v2 import ResearchV2
 from .research_v3 import ResearchV3
 from .j7_hub import J7Hub
 from .realtime import RealtimeStore
+from .world_watch import WorldStore
 
-class Store(RealtimeStore, J7Hub, ResearchV3, ResearchV2, ResearchStore):
+class Store(WorldStore, RealtimeStore, J7Hub, ResearchV3, ResearchV2, ResearchStore):
     def __init__(self, path):
         self.path = str(Path(path).resolve())
         self._db_lock = threading.RLock()
@@ -75,6 +76,7 @@ class Store(RealtimeStore, J7Hub, ResearchV3, ResearchV2, ResearchStore):
         self.init_research_v3()
         self.init_j7_hub()
         self.init_realtime()
+        self.init_world()
 
     @contextmanager
     def db(self):
@@ -348,6 +350,7 @@ class Store(RealtimeStore, J7Hub, ResearchV3, ResearchV2, ResearchStore):
             row = db.execute('SELECT * FROM safety_cache WHERE mint=?', (mint,)).fetchone()
         if row and row['ts'] > time.time() - ttl_s:
             payload=json.loads(row['data_json'])
+            payload['_checked_at'] = row['ts']
             if 'top10_method' in payload: return payload
         return None
 
@@ -526,7 +529,7 @@ class Store(RealtimeStore, J7Hub, ResearchV3, ResearchV2, ResearchStore):
 
     def recent_social(self,limit=60):
         with self.read_db() as db:
-            rows=db.execute('SELECT data_json FROM social_posts ORDER BY received_at DESC LIMIT ?', (min(int(limit),200),)).fetchall()
+            rows=db.execute('SELECT data_json FROM social_posts ORDER BY received_at DESC LIMIT ?', (max(1,min(int(limit),500)),)).fetchall()
         return [json.loads(row[0]) for row in rows]
 
     def social_mints_recent(self,seconds=900,limit=10):

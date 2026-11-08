@@ -17,6 +17,8 @@ from radar.live_launches import LaunchFeed
 from radar.realtime import compare_cohorts
 from radar.x_verification import XVerifier
 from radar.j7_hub import HighlightTracker
+from radar.world_watch import WorldMonitor, build_report, social_events
+from radar.strategies import enforce_gate
 
 ROOT=Path(__file__).resolve().parent
 WEB=ROOT/'web'
@@ -50,14 +52,16 @@ def demo_payload():
           'history':[{'ts':now-900+60*x,'price':p} for x,p in enumerate(prices)],
           'observed_change_pct':round((prices[-1]/prices[0]-1)*100,2),
           'pieces':{'liquidité':12,'volume/liquidité':9,'pression acheteuse':8,'sécurité autorités':10}})
-    return {'coins':coins,'stats':{'total':len(coins),'interesting':2,'incomplete':2,'risky':1},
+    for coin in coins:
+        enforce_gate(coin,now)
+    return {'coins':coins,'stats':{'total':len(coins),'interesting':0,'incomplete':4,'risky':1},
       'status':{'mode':'demo','running':False,'last_scan':now,'cycle':1,'scanned':6,'discovered':6,
       'interval_seconds':20,'next_scan':None,'started_at':None,'finished_at':now,'duration_seconds':0,
       'phase':'Simulation figée','progress_done':0,'progress_total':0,'last_outcome':'ok','new_tokens':0,
-      'engine_version':'v8.1','errors':['Exemple fictif : aucune connexion aux marchés ; aucun de ces tokens n’est une recommandation.']}}
+      'engine_version':'v2.0','errors':['Exemple fictif : aucune connexion aux marchés ; aucun de ces tokens n’est une recommandation.']}}
 
 
-def make_handler(radar, demo=False, j7=None, verifier=None, restart_callback=None, launches=None, tracker=None):
+def make_handler(radar, demo=False, j7=None, verifier=None, restart_callback=None, launches=None, tracker=None, world=None):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, fmt,*args):
             if not self.path.startswith('/api/data'): super().log_message(fmt,*args)
@@ -76,6 +80,17 @@ def make_handler(radar, demo=False, j7=None, verifier=None, restart_callback=Non
         def do_GET(self):
             path=urlparse(self.path).path
             if path=='/api/data': return self.respond(demo_payload() if demo else radar.view())
+            if path=='/api/v2':
+                now=time.time()
+                coins=demo_payload()['coins'] if demo else radar.view()['coins']
+                events=[] if demo else radar.store.world_events(now)+social_events(radar.store.recent_social(500),now)
+                if not demo:
+                    histories=radar.store.strategy_histories([c['mint'] for c in coins],now)
+                    for coin in coins:coin['strategy_history']=histories.get(coin['mint'],[])
+                data=build_report(coins,events,now)
+                data['demo']=demo
+                data['news_status']=world.status if world else {'state':'demo' if demo else 'not_started'}
+                return self.respond(data)
             if path=='/api/research':
                 return self.respond({'version':3,'total_events':0,'groups':[],'note':'Démo : aucune mesure réelle'} if demo else radar.store.report_v3())
             if path=='/api/j7':
@@ -121,7 +136,7 @@ def make_handler(radar, demo=False, j7=None, verifier=None, restart_callback=Non
                          r.get('price_usd'),r.get('liquidity_usd'),r.get('volume_h1_usd'),r.get('change_m5_pct'),
                          r.get('age_min'),';'.join(r.get('sources',[])),';'.join(p.get('label','') for p in r.get('patterns',[])),';'.join(r.get('risks',[])),';'.join(r.get('unknown',[]))])
                 return self.respond(s.getvalue(),'text/csv; charset=utf-8')
-            if path in ('/','/index.html','/v8.css','/v8.js'):
+            if path in ('/','/index.html','/v8.css','/v8.js','/v2.js'):
                 file=WEB/('index.html' if path=='/' else path.lstrip('/'))
                 ctype='text/html; charset=utf-8' if file.suffix=='.html' else ('text/css; charset=utf-8' if file.suffix=='.css' else 'application/javascript; charset=utf-8')
                 return self.respond(file.read_text(encoding='utf-8'),ctype)
@@ -174,6 +189,7 @@ def main():
     radar=None if args.demo else Radar(args.db,args.wallets,args.interval,args.limit,args.rpc)
     verifier=None if args.demo or args.once else XVerifier(radar.store,radar.social_wakeup)
     trends=None if args.demo or args.once else TrendsMonitor(radar.store,radar.stop_event)
+    world=None if args.demo or args.once else WorldMonitor(radar.store,radar.stop_event)
     j7=None if args.demo or args.once else J7Feed(radar.store,radar.social_wakeup,verifier=verifier)
     launches=None if args.demo or args.once else LaunchFeed(radar.store,radar.stop_event,radar.social_wakeup)
     if launches and args.no_launch_feed:
@@ -198,7 +214,7 @@ def main():
         return True
     try:
         server=ThreadingHTTPServer(('127.0.0.1',args.port),
-            make_handler(radar,args.demo,j7,verifier,request_restart,launches,tracker))
+            make_handler(radar,args.demo,j7,verifier,request_restart,launches,tracker,world))
     except OSError:
         print(f"Port {args.port} indisponible : fermez l'autre instance de MemeRadar puis relancez.")
         return
@@ -211,6 +227,7 @@ def main():
         threading.Thread(target=j7.run,name='j7-social-listener',daemon=True).start()
         threading.Thread(target=tracker.run,name='j7-highlight-tracker',daemon=True).start()
         threading.Thread(target=trends.run,name='public-trends-listener',daemon=True).start()
+        threading.Thread(target=world.run,name='world-news-listener',daemon=True).start()
         if not args.no_launch_feed:
             threading.Thread(target=launches.run,name='free-launch-feed',daemon=True).start()
         if verifier.token:

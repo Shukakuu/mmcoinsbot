@@ -45,6 +45,6 @@ class DiscoveryRegression(unittest.TestCase):
             self.assertEqual(radar.status['new_candidates'],1)
             self.assertIn(NEW,examined)
             self.assertEqual(radar.status['known_total'],1101)
-            self.assertEqual(radar.status['engine_version'],'v8.1')
+            self.assertEqual(radar.status['engine_version'],'v2.0')
 
 if __name__=='__main__':unittest.main()

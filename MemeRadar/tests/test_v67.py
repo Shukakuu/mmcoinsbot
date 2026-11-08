@@ -81,7 +81,9 @@ class PreImpulseTests(unittest.TestCase):
                 self.assertTrue(radar.run_once())
             c=radar.store.get(MINT)
             self.assertTrue(c['pre_impulse'])
-            self.assertEqual(c['status'],'a_etudier')
+            # V2: early observation survives, missing LP proof prevents promotion.
+            self.assertEqual(c['status'],'incomplet')
+            self.assertEqual(c['security_gate']['state'],'unverified')
             self.assertLess(c['change_m5_pct'],1.0)
             self.assertEqual(c['pressure_buys_m5'],65)
 

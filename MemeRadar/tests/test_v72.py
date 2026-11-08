@@ -283,7 +283,7 @@ class ReportAndProvenanceTests(unittest.TestCase):
             coin = radar.view()['coins'][0]
             self.assertEqual(coin['j7']['author'], 'elonmusk')
             self.assertEqual(coin['score'], 20)          # a highlight never changes the score
-            self.assertEqual(radar.status['engine_version'], 'v8.1')
+            self.assertEqual(radar.status['engine_version'], 'v2.0')
 
 
 if __name__ == '__main__':

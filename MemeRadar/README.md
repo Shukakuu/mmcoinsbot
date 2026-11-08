@@ -1,3 +1,11 @@
+# MemeRadar V2
+
+Version du 8 novembre 2026, construite sur la base v8.1.
+
+Lancer `START_V2.bat` (ou le lanceur J7 habituel). Guide V2, profils FAST/TREND/GROWTH, limites et restauration : [docs/V2.md](docs/V2.md).
+
+---
+
 # MemeRadar v8.1 — correctifs, suivi et interface accélérée
 
 Version du 7 novembre 2026, basée sur la v8.0 code seul et votre configuration de 353 wallets. Application locale, lecture seule : aucune transaction, aucun achat automatique, aucune clé privée. Les scores restent des classements heuristiques, pas des probabilités de hausse.

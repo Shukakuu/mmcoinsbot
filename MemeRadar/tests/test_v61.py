@@ -37,11 +37,12 @@ class Regression61(unittest.TestCase):
   self.assertEqual(saved['coverage'],90)
   self.assertGreater(radar.status['gecko_resume_at'],time.time())
   self.assertEqual(radar.status['errors'],[])
- def test_old_records_are_returned_without_eligibility_flag(self):
+ def test_old_records_are_explicitly_not_eligible_v2(self):
   radar=Radar(self.store.path,'/missing')
   self.store.save_coin({'mint':MINT,'symbol':'OLD','name':'Old','score':60,'status':'surveillance','price_usd':1},time.time()-86400)
   coins=radar.view()['coins'];self.assertEqual(len(coins),1)
-  self.assertNotIn('eligible',coins[0])
+  self.assertFalse(coins[0]['eligible'])
+  self.assertEqual(coins[0]['security_gate']['state'],'unverified')
  def test_j7_update_error_clears_after_success(self):
   feed=J7Feed(self.store,token='fake');feed._state(error='Mise à jour ignorée : OperationalError')
   feed.ingest(event());self.assertIsNone(feed.report()['error'])

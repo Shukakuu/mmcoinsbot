@@ -21,7 +21,8 @@ class V8(unittest.TestCase):
   self.store=Store(self.path)
 
  def test_schema_version_and_idempotence(self):
-  self.assertEqual(sqlite3.connect(self.path).execute('PRAGMA user_version').fetchone()[0],9)
+  with self.store.read_db() as db:
+   self.assertEqual(db.execute('PRAGMA user_version').fetchone()[0],9)
   again=Store(self.path)
   self.assertEqual(again.live_health()['total'],0)
   self.assertFalse(again.live_launch(None)['new'])

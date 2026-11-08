@@ -65,7 +65,9 @@ class Curves(unittest.TestCase):
                  patch('radar.engine.providers.rug_report',return_value=safe()):
                 self.assertTrue(radar.run_once())
             c=radar.store.get(M)
-            self.assertEqual(c['status'],'a_etudier')
+            # V2: early observation survives, missing LP proof prevents promotion.
+            self.assertEqual(c['status'],'incomplet')
+            self.assertEqual(c['security_gate']['state'],'unverified')
             self.assertEqual(c['score_method'],'curve_experimentale')
             self.assertIsNone(c['liquidity_usd'])
             self.assertFalse(c['eligible'])

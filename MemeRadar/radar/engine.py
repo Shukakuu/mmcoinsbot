@@ -16,6 +16,7 @@ from .realtime import LaunchQuoteWorker,compare_cohorts
 from .selection import discovery_priority,early_rank,select_candidates
 from .onchain_risk import SolanaRiskObserver
 from .store import Store
+from .strategies import enforce_gate
 
 # Une cotation vieille de plusieurs minutes ne doit pas être présentée comme un signal actuel.
 LIVE_MAX_AGE_S = 300
@@ -34,7 +35,7 @@ class Radar:
                      'interval_seconds':self.interval,'next_scan':None,'started_at':None,'finished_at':None,
                      'duration_seconds':None,'phase':'En attente du premier scan',
                      'progress_done':0,'progress_total':0,'last_outcome':None,'new_tokens':0,
-                     'new_candidates':0,'pairs_found':0,'queued_social':0,'engine_version':'v8.1','known_total':0,'scan_stages_s':{}}
+                     'new_candidates':0,'pairs_found':0,'queued_social':0,'engine_version':'v2.0','known_total':0,'scan_stages_s':{}}
         self.stop_event=threading.Event()
         self.refresh_event=threading.Event()
         self._last_social_wake=0
@@ -266,6 +267,7 @@ class Radar:
                     try:
                         safety=safety_jobs[mint].result()
                         self.store.save_safety(mint,safety)
+                        safety['_checked_at']=time.time()
                     except Exception as exc:
                         warnings.append(f'RugCheck {mint[:6]}…: {type(exc).__name__}')
                         safety={}
@@ -350,6 +352,7 @@ class Radar:
                     'pressure_sells_m5':pressure['snapshot']['sells_m5'],
                     'volume_m5_usd':pressure['snapshot']['volume_m5'],
                     'pressure_buy_share':pressure.get('buy_share'),
+                    'safety_checked_at':safety.get('_checked_at'),
                     'safety_summary':{'mint_active':safety.get('mint_active'),
                         'freeze_active':safety.get('freeze_active'),'top10_pct':safety.get('top10_pct'),
                         'rugcheck_score':safety.get('rugcheck_risk_score'),
@@ -389,12 +392,15 @@ class Radar:
                 # It changes analysis PRIORITY only, never the safety/status or market score.
                 result['attention_score']=min(30,6*official+3*upstream+(6 if influencers>=2 else 0))
                 result['priority_score']=round(min(100,report['market_score']/(82 if curve else 50)*70+result['attention_score']),1)
-                result['analysis_version']='v8.1'
+                result['analysis_version']='v2.0'
                 # Require core evidence; a 100% coverage number alone does not prove safety.
                 result['eligible']=(curve is None and not result['risks'] and result['coverage']>=90
                     and liquidity is not None and liquidity>=5000
                     and safety.get('mint_active') is False and safety.get('freeze_active') is False
                     and safety.get('rugcheck_risk_score') is not None)
+                result['onchain_risk']=self.store.observed_risks([mint]).get(mint)
+                enforce_gate(result, result['decision_at'])
+                self.store.save_strategy_sample(result, pair_observed_at)
                 result['pair_changed'] = bool(prior.get('pair_address') and prior.get('pair_address')!=result['pair_address'])
                 self.store.save_market_snapshot(mint,pressure['snapshot'])
                 self.store.save_coin(result,time.time())
@@ -473,15 +479,19 @@ class Radar:
         coins=self.store.list_coins()
         now=time.time()
         origins=self.store.first_highlights([c['mint'] for c in coins])
+        observed_risks=self.store.observed_risks([c['mint'] for c in coins])
         for c in coins:
             c['j7']=origins.get(c['mint'])
+            c['onchain_risk']=observed_risks.get(c['mint'])
+            original_status=c.get('status')
+            enforce_gate(c,now)
             elapsed=max(0,now-(c.get('market_quote_at') or c.get('last_seen',0)))
             c['data_age_seconds']=int(elapsed)
             c['fresh']=elapsed<=LIVE_MAX_AGE_S
             # Important: override UNIQUEMENT sur les données renvoyées à l'interface,
             # jamais dans la base d'historique. Un vieux « À étudier » n'est pas live.
             if not c['fresh']:
-                c['previous_status']=c.get('status')
+                c['previous_status']=original_status
                 c['status']='expire'
             if (c.get('first_price_usd') or 0)>0 and (c.get('price_usd') or 0)>0:
                 c['observed_change_pct']=round((c['price_usd']/c['first_price_usd']-1)*100,2)

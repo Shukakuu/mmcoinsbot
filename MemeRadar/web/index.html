@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MemeRadar — Veille Solana</title><link rel="stylesheet" href="/v8.css"><script defer src="/v8.js"></script></head>
+<title>MemeRadar — Veille Solana</title><link rel="stylesheet" href="/v8.css"><script defer src="/v8.js"></script><script defer src="/v2.js"></script></head>
 <body>
 <div class="shell">
   <aside class="sidebar">
@@ -9,7 +9,7 @@
     <div class="side-bottom"><span class="signal-dot" id="healthDot"></span><span id="healthText">Connexion…</span><div class="side-caption">Lecture seule · aucune transaction</div></div>
   </aside>
   <main id="top">
-    <header class="top"><div><div class="eyebrow">DÉCOUVERTE EN CONTINU</div><h1>Market overview <span class="version">V8.1</span></h1><p>De l’événement J7 au lancement Solana, avec risques visibles.</p></div><div class="top-actions"><span id="updateAt">—</span><button id="refresh" class="action">↻ Actualiser le scan</button><button id="restart" class="action">Relancer les services</button></div></header>
+    <header class="top"><div><div class="eyebrow">DÉCOUVERTE EN CONTINU</div><h1>Veille des marchés <span class="version">V2</span></h1><p>De l’événement J7 au lancement Solana, avec risques visibles.</p></div><div class="top-actions"><span id="updateAt">—</span><button id="refresh" class="action">↻ Actualiser le scan</button><button id="restart" class="action">Relancer les services</button></div></header>
     <div class="notice">Les mots surlignés et les coins associés sont des hypothèses. Aucune narrative, aucun score et aucun prix indicatif ne garantissent une hausse ou une revente possible.</div>
     <section class="kpis" aria-label="Indicateurs">
       <article class="kpi"><span>Nouveaux lancements enregistrés</span><strong id="kLaunches">—</strong><small>Flux natif, avant cotation DEX</small></article>
@@ -17,6 +17,12 @@
       <article class="kpi"><span>Tokens cotés</span><strong id="kQuoted">—</strong><small>DEX ultérieur, USD observable</small></article>
       <article class="kpi"><span>En cours de suivi</span><strong id="kFollow">—</strong><small>Tokens thématiques + témoins</small></article>
     </section>
+    <section class="panel tokens" id="strategies"><div class="panel-head"><div><h2>Trois stratégies · décisions manuelles</h2><p>Les risques bloquent tous les horizons. Une donnée absente reste non vérifiée.</p></div></div>
+      <div class="filters"><select id="strategyHorizon" aria-label="Stratégie"><option value="minutes">FAST · Minutes</option><option value="hours">TREND · Heures</option><option value="days">GROWTH · Jours</option></select><select id="strategyState" aria-label="État de stratégie"><option value="all">Tous les états</option><option value="review">À examiner manuellement</option><option value="watch">À surveiller</option><option value="unverified">Non vérifiés</option><option value="blocked">Bloqués</option></select></div>
+      <div id="strategyRows">Chargement des contrôles…</div><p id="strategyNote" class="sub-note"></p>
+    </section>
+    <section class="columns" id="world"><article class="panel"><div class="panel-head"><h2>Actualités mondiales &amp; X/J7</h2></div><p id="worldHealth" class="sub-note">Connexion aux sources publiques…</p><div id="worldNews"></div></article><article class="panel"><div class="panel-head"><h2>Narratifs émergents</h2></div><p class="sub-note">Fenêtres d’une heure, déduplication des titres, au moins trois mentions et deux sources pour signaler une émergence. Ce n’est pas une prédiction.</p><div id="emergingNarratives"></div></article></section>
+    <section class="panel"><h2>Événements à venir</h2><p class="sub-note">Dates explicites dans les titres, non confirmées officiellement.</p><div id="upcomingEvents">En attente…</div></section>
     <section class="columns" id="narratives">
       <article class="panel"><div class="panel-head"><div><h2>Mots en veille <span class="soft-tag">J7</span></h2><p>Expressions repérées dans les publications réellement reçues.</p></div><small id="j7State">J7 : en attente</small></div><div id="themes" class="terms"><div class="empty-small">Aucune narrative récente.</div></div><details class="mini-disclose"><summary>Dernières publications J7 reçues</summary><div id="recentPosts" class="recent-posts">Aucune publication reçue.</div></details><p class="sub-note">Le compte auteur est conservé, sans supposer qu’il soutient un token.</p></article>
       <article class="panel"><div class="panel-head"><div><h2>Créations reliées</h2><p>Repérées dès le lancement, même sans prix DEX.</p></div><small id="launchState">Flux : en attente</small></div><div id="liveLaunches" class="live-list"><div class="empty-small">En attente des nouveaux lancements.</div></div></article>
@@ -27,7 +33,7 @@
     <section class="panel measures" id="research"><div class="panel-head"><div><h2>Mesure des signaux J7</h2><p>Comparaison prospective avec les lancements témoins. Résultats non exécutables.</p></div><select id="horizon" aria-label="Horizon de mesure"><option value="300">5 min</option><option value="600">10 min</option><option value="1200">20 min</option><option value="3600">1 h</option><option value="10800">3 h</option><option value="21600">6 h</option></select><small id="researchHealth">En attente de données.</small></div><div class="comparison"><div><span>Tokens reliés à une narrative</span><strong id="cmpMatch">—</strong><small id="cmpMatchN">— mesures</small></div><div><span>Tokens témoins indépendants</span><strong id="cmpControl">—</strong><small id="cmpControlN">— mesures</small></div></div><p class="sub-note" id="comparisonNote">Référence : prix observé après 30 s. Cotation manquante = résultat non mesuré. Liquidité, frais et possibilité de vente non validés.</p></section>
     <details class="panel diagnostic"><summary>Auteurs, copies possibles et wallets</summary><div id="intelligence">En attente…</div></details>
     <details class="panel diagnostic"><summary>Sources et diagnostics techniques</summary><div id="diagnostics">En attente des services…</div></details>
-    <footer>V8.1 · Observations, pas recommandations. Une hausse affichée n’est pas un bénéfice réalisé. Interface liée à 127.0.0.1 uniquement.</footer>
+    <footer>V2 · Observations, pas recommandations. Une hausse affichée n’est pas un bénéfice réalisé. Interface liée à 127.0.0.1 uniquement.</footer>
   </main>
 </div>
 <div class="veil hidden" id="veil"><section class="details" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><div class="detail-head"><div><small>FICHE DU TOKEN</small><h2 id="detailTitle">—</h2></div><button id="closeDetail" class="close" aria-label="Fermer">×</button></div><div id="detailContent"></div></section></div>

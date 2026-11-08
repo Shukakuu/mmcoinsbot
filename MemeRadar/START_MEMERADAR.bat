@@ -2,7 +2,7 @@
 chcp 65001 >nul
 cd /d "%~dp0"
 echo ===============================================
-echo MemeRadar v8.1 - Radar J7 et Solana (lecture seule)
+echo MemeRadar V2 - Radar J7 et Solana (lecture seule)
 echo ===============================================
 py -3.13 --version >nul 2>nul
 if not errorlevel 1 goto python313

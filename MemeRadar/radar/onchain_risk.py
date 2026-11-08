@@ -73,8 +73,8 @@ class SolanaRiskObserver:
         now=time.time() if now is None else now
         with self.store.live_db() as db:
             row=db.execute('''SELECT l.mint,l.creator FROM live_launches l LEFT JOIN live_risk_observations r USING(mint)
-                        WHERE l.matched=1 AND l.first_at<=? AND l.first_at>=? AND r.mint IS NULL
-                        ORDER BY l.first_at DESC LIMIT 1''',(now-15,now-7200)).fetchone()
+                        WHERE l.matched=1 AND l.first_at<=? AND l.first_at>=? AND (r.mint IS NULL OR r.checked_at<?)
+                        ORDER BY COALESCE(r.checked_at,0),l.first_at DESC LIMIT 1''',(now-15,now-7200,now-300)).fetchone()
         if not row:return False
         try:
             result=self.inspect(row['mint'],row['creator'])

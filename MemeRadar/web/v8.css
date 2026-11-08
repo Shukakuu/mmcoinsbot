@@ -3,3 +3,7 @@
 .mini-disclose{border-top:1px solid var(--line);padding-top:9px;margin-top:12px;color:var(--sub);font-size:10px}.mini-disclose summary{cursor:pointer}.recent-posts{max-height:250px;overflow:auto}.post-mini{padding:8px 0;border-bottom:1px solid #292f36}.post-mini b{display:block;color:var(--text);font-size:10px}.post-mini span{display:block;margin-top:4px;line-height:1.5;overflow-wrap:anywhere}.term-link{display:block;font-size:9px;margin-top:4px}
 
 main{min-width:0;flex:1}.top-actions,.panel-head,.filters{flex-wrap:wrap}#intelligence{overflow-wrap:anywhere;line-height:1.7}@media(max-width:680px){.top{flex-wrap:wrap}.top-actions{flex-direction:row;align-items:center}.panel-head select{max-width:100%}}
+#strategyRows{max-height:440px;overflow:auto;padding:0 12px}
+#strategyRows .field{display:block;border-bottom:1px solid #283244;padding:12px 0}
+#strategyRows p{font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+#worldNews,#emergingNarratives,#upcomingEvents{padding:0 18px 18px;font-size:13px;line-height:1.6;overflow-wrap:anywhere}

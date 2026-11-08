@@ -31,11 +31,12 @@ class FreshnessTests(unittest.TestCase):
         self.assertEqual(view['stats']['interesting'],0)
         self.assertEqual(view['stats']['expired'],1)
         self.assertEqual(self.radar.store.get(MINT)['status'],'a_etudier')
-    def test_recent_keeps_real_status(self):
+    def test_recent_without_safety_is_unverified_v2(self):
         self.old(25)
         coin=self.radar.view()['coins'][0]
         self.assertTrue(coin['fresh'])
-        self.assertEqual(coin['status'],'a_etudier')
+        self.assertEqual(coin['status'],'incomplet')
+        self.assertEqual(coin['security_gate']['state'],'unverified')
         self.assertLess(coin['data_age_seconds'],LIVE_MAX_AGE_S)
     def test_missing_live_pair_does_not_fake_update(self):
         self.old()
