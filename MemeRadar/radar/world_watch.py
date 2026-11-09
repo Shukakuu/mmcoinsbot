@@ -7,12 +7,15 @@ import time
 import urllib.request
 import xml.etree.ElementTree as ET
 from email.utils import parsedate_to_datetime
+from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import lru_cache
 from urllib.parse import urlparse, quote
 from .narrative_intelligence import extract_phrases, topic_is_related
 from .narratives import normal
-from .strategies import assess
+from .decision_engine import assess
 from .event_calendar import upcoming
-from .narrative_graph import discover_terms, topic_graph
+from .narrative_graph import discover_terms, topic_graph, source_voice
 
 SOURCES = (
     ('BBC World', 'https://feeds.bbci.co.uk/news/world/rss.xml'),
@@ -27,8 +30,26 @@ SOURCES = (
 
 def safe_url(value):
     value = str(value or '')[:1000]
-    parsed = urlparse(value)
-    return value if parsed.scheme in ('http', 'https') and parsed.hostname and not parsed.username else ''
+    try:
+        parsed = urlparse(value)
+        return value if parsed.scheme in ('http', 'https') and parsed.hostname and not parsed.username else ''
+    except ValueError:
+        return ''
+
+
+def parse_date(value):
+    if not value:
+        return None
+    try:
+        result = parsedate_to_datetime(value)
+    except (ValueError, TypeError, OverflowError):
+        try:
+            result = datetime.fromisoformat(str(value).replace('Z', '+00:00'))
+        except (ValueError, TypeError, OverflowError):
+            return None
+    if result.tzinfo is None:
+        return None  # Never invent a publication timezone.
+    return result.timestamp()
 
 
 def parse_feed(raw, source, now):
@@ -36,15 +57,18 @@ def parse_feed(raw, source, now):
         raise ValueError('RSS invalide ou trop volumineux')
     root = ET.fromstring(raw)
     result = []
-    for item in root.findall('.//item')[:100]:
-        title = ' '.join((item.findtext('title') or '').split())[:250]
-        try:
-            published = parsedate_to_datetime(item.findtext('pubDate') or '').timestamp()
-        except (ValueError, TypeError, OverflowError):
-            continue
-        if not title or not now - 7 * 86400 <= published <= now:
+    for item in (root.findall('.//item') + root.findall('.//{*}entry'))[:100]:
+        title = ' '.join((item.findtext('title') or item.findtext('{*}title') or '').split())[:250]
+        published = parse_date(item.findtext('pubDate') or item.findtext('{*}published') or item.findtext('{*}updated'))
+        if not title or published is None or not now - 7 * 86400 <= published <= now:
             continue
         url = safe_url(item.findtext('link'))
+        if not url:
+            for link in item.findall('{*}link'):
+                if link.get('rel', 'alternate')=='alternate':
+                    url = safe_url(link.get('href'))
+                    if url:
+                        break
         identity = source + '|' + (url or normal(title))
         result.append({'id': hashlib.sha256(identity.encode()).hexdigest(),
                        'title': title, 'source': source, 'url': url,
@@ -109,12 +133,30 @@ class WorldStore:
 
 
 class WorldMonitor:
-    def __init__(self, store, stop_event, fetch=None, search=None):
+    def __init__(self, store, stop_event, fetch=None, search=None, sources=None):
         self.store, self.stop_event = store, stop_event
         self.fetch = fetch or self._fetch
         self.search = search or search_tokens
         self.searched = {}
-        self.status = {'interval_s': 300, 'sources': {}, 'last_cycle': None}
+        self.sources = sources
+        self.next_rss = 0
+        self.next_search = 0
+        self.status = {'interval_s': 30, 'rss_interval_s':300, 'sources': {}, 'last_cycle': None}
+
+    def _news_results(self, now):
+        if now < self.next_rss or self.stop_event.is_set():
+            return
+        self.next_rss = now+300
+        sources = SOURCES if self.sources is None else self.sources
+        with ThreadPoolExecutor(max_workers=4, thread_name_prefix='world-rss') as pool:
+            jobs = {pool.submit(self.fetch, url):name for name,url in sources}
+            for job in as_completed(jobs):
+                if self.stop_event.is_set():
+                    break
+                try:
+                    yield jobs[job], job.result(), None
+                except Exception as exc:
+                    yield jobs[job], None, type(exc).__name__
 
     @staticmethod
     def _fetch(url):
@@ -126,12 +168,15 @@ class WorldMonitor:
         now = time.time()
         queued = set()
         candidates = []
-        for name, url in SOURCES:
+        for name, raw, error in self._news_results(now):
             if self.stop_event.is_set():
                 break
             previous = self.status['sources'].get(name, {})
+            if error:
+                self.status['sources'][name] = {**previous, 'error':error, 'last_failure':now}
+                continue
             try:
-                events = parse_feed(self.fetch(url), name, now)
+                events = parse_feed(raw, name, now)
                 added = self.store.save_world_events(events, now)
                 candidates.extend(e for e in added if now-e['published_at'] <= 3600)
                 self.status['sources'][name] = {'last_success': now, 'items': len(events),
@@ -147,6 +192,11 @@ class WorldMonitor:
             except Exception as exc:
                 self.status['sources'][name] = {**previous, 'error': type(exc).__name__, 'last_failure': now}
         candidates.extend(social_events(self.store.recent_social(100), now))
+        self.status['social_checked_at'] = now
+        if now < self.next_search:
+            candidates = []
+        else:
+            self.next_search = now+300
         self.searched = {term: stamp for term, stamp in self.searched.items() if now-stamp < 3600}
         searches = 0
         self.status['search_error'] = None
@@ -181,7 +231,7 @@ class WorldMonitor:
                 self.update()
             except Exception as exc:
                 self.status['error'] = type(exc).__name__
-            self.stop_event.wait(300)
+            self.stop_event.wait(30)
 
 
 def search_tokens(term, get=None):
@@ -199,6 +249,7 @@ def search_tokens(term, get=None):
 
 
 def social_events(posts, now):
+    from .social import is_solana_address
     out = []
     for post in posts:
         if any(post.get(k) for k in ('deleted', 'is_backlog', 'is_repost', 'is_reply')):
@@ -211,21 +262,31 @@ def social_events(posts, now):
                     'source': 'J7 @' + str(post.get('author') or '?'),
                     'url': safe_url(post.get('url')), 'published_at': published,
                     'received_at': post.get('received_at'), 'kind': 'social',
+                    'mints':[mint for mint in (post.get('mints') or [])[:10] if is_solana_address(mint)],
                     'terms': discover_terms(title)})
     return out
+
+
+@lru_cache(maxsize=4096)
+def _topic_pattern(term):
+    phrase = normal(term)
+    return phrase, re.compile(r'(?<![a-z0-9])'+re.escape(phrase)+r'(?![a-z0-9])')
 
 
 def link_events(coin, events):
     links = []
     mint = str(coin.get('mint') or '')
+    name, symbol = normal(coin.get('name')), normal(coin.get('symbol'))
     related = {}
     for event in events:
-        direct = bool(mint and mint in event['title'] and re.search(r'(?<![A-Za-z0-9])' + re.escape(mint) + r'(?![A-Za-z0-9])', event['title']))
+        direct = bool(mint and (mint in event.get('mints', []) or (mint in event['title'] and re.search(r'(?<![A-Za-z0-9])' + re.escape(mint) + r'(?![A-Za-z0-9])', event['title']))))
         terms = []
         for item in event['terms']:
             term = item['term']
             if term not in related:
-                related[term] = topic_is_related(term, coin.get('name'), coin.get('symbol'))
+                phrase, pattern = _topic_pattern(term)
+                related[term] = (topic_is_related(term, name, symbol) if term=='GTA VI' else
+                                 bool(phrase and ((name and pattern.search(name)) or (len(phrase)>=5 and phrase==symbol))))
             if related[term]:
                 terms.append(term)
         if direct or terms:
@@ -251,7 +312,7 @@ def emerging(events, now):
             g['titles'].add(title)
             g['current' if age < 3600 else 'previous'] += 1
             if age < 3600:
-                g['sources'].add(event['source'])
+                g['sources'].add(source_voice(event['source']))
     out = []
     for g in groups.values():
         g.pop('titles')
@@ -259,7 +320,7 @@ def emerging(events, now):
         g['emerging'] = g['current'] >= 3 and len(g['sources']) >= 2 and g['current'] > 2 * g['previous']
         g['phase'] = ('acceleration' if g['emerging'] else 'appearance' if g['previous']==0 else
                       'decline' if g['current'] < g['previous'] else 'persistent')
-        if g['current']:
+        if g['current'] or g['previous']:
             out.append(g)
     return sorted(out, key=lambda g: (g['emerging'], g['current']), reverse=True)[:30]
 
@@ -269,9 +330,11 @@ def build_report(coins, events, now=None):
     events = sorted(events, key=lambda e: e['published_at'], reverse=True)
     rows = []
     for coin in coins:
-        links = link_events(coin, events)
+        evaluated = coin.get('decision_evaluated_at') == now and 'strategy_decisions' in coin
+        links = coin['world_context'] if evaluated else link_events(coin, events)
+        decision = {'risk':coin['security_gate'], 'strategies':coin['strategy_decisions']} if evaluated else assess(coin, links, now)
         rows.append({'mint': coin['mint'], 'symbol': coin.get('symbol'), 'name': coin.get('name'),
-                     **assess(coin, links, now), 'events': links[:12], 'event_count': len(links)})
+                     **decision, 'events': links[:12], 'event_count': coin.get('world_event_count', len(links)) if evaluated else len(links)})
     return {'version': '2.0', 'generated_at': now, 'manual_only': True, 'coins': rows,
             'events': events[:60], 'narratives': emerging(events, now), 'upcoming': upcoming(events, now),
             'topic_graph': topic_graph(events),

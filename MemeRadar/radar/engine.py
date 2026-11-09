@@ -16,7 +16,9 @@ from .realtime import LaunchQuoteWorker,compare_cohorts
 from .selection import discovery_priority,early_rank,select_candidates
 from .onchain_risk import SolanaRiskObserver
 from .store import Store
-from .strategies import enforce_gate
+from .decision_engine import apply_decision
+from .world_intel import events_for_store
+from .world_watch import link_events
 
 # Une cotation vieille de plusieurs minutes ne doit pas être présentée comme un signal actuel.
 LIVE_MAX_AGE_S = 300
@@ -228,6 +230,8 @@ class Radar:
                 self.store.record_v3(provisional,prior,provisional['decision_at'])
             # At most three concurrent risk requests; the shared provider pacer still applies.
             safety_pool=ThreadPoolExecutor(max_workers=3,thread_name_prefix='risk-check')
+            world_events=events_for_store(self.store,t)
+            strategy_histories=self.store.strategy_histories(chosen,t)
             safety_cached={m:self.store.cached_safety(m) for m in chosen if pairs.get(m)}
             safety_jobs={m:safety_pool.submit(providers.rug_report,m) for m,v in safety_cached.items() if v is None}
             self.status['phase']='Vérification des cotations indépendantes'
@@ -359,6 +363,7 @@ class Radar:
                         'rugged':safety.get('rugged'),
                         'top10_method':safety.get('top10_method'),
                         'rugcheck_risks_at_quote':list(safety.get('risk_details') or [])[:12],
+                        'rugcheck_risk_levels':list(safety.get('risk_levels') or [])[:30],
                         'lp_locked_pct':(safety.get('lp_locked_by_pool') or {}).get(pair.get('pairAddress')) if pair else None},
                     **report}
                 result['market_quote_at']=pair_observed_at
@@ -393,13 +398,10 @@ class Radar:
                 result['attention_score']=min(30,6*official+3*upstream+(6 if influencers>=2 else 0))
                 result['priority_score']=round(min(100,report['market_score']/(82 if curve else 50)*70+result['attention_score']),1)
                 result['analysis_version']='v2.0'
-                # Require core evidence; a 100% coverage number alone does not prove safety.
-                result['eligible']=(curve is None and not result['risks'] and result['coverage']>=90
-                    and liquidity is not None and liquidity>=5000
-                    and safety.get('mint_active') is False and safety.get('freeze_active') is False
-                    and safety.get('rugcheck_risk_score') is not None)
                 result['onchain_risk']=self.store.observed_risks([mint]).get(mint)
-                enforce_gate(result, result['decision_at'])
+                result['strategy_history']=strategy_histories.get(mint,[])
+                apply_decision(result,link_events(result,world_events),result['decision_at'])
+                result.pop('strategy_history',None)
                 self.store.save_strategy_sample(result, pair_observed_at)
                 result['pair_changed'] = bool(prior.get('pair_address') and prior.get('pair_address')!=result['pair_address'])
                 self.store.save_market_snapshot(mint,pressure['snapshot'])
@@ -475,16 +477,20 @@ class Radar:
         except Exception as exc:
             self.status['errors']=(self.status['errors']+[f'Suivi des résultats: {type(exc).__name__}'])[-16:]
 
-    def view(self):
+    def view(self, now=None):
         coins=self.store.list_coins()
-        now=time.time()
+        now=time.time() if now is None else now
+        world_events=events_for_store(self.store,now)
+        histories=self.store.strategy_histories([c['mint'] for c in coins],now)
         origins=self.store.first_highlights([c['mint'] for c in coins])
         observed_risks=self.store.observed_risks([c['mint'] for c in coins])
         for c in coins:
             c['j7']=origins.get(c['mint'])
             c['onchain_risk']=observed_risks.get(c['mint'])
             original_status=c.get('status')
-            enforce_gate(c,now)
+            c['strategy_history']=histories.get(c['mint'],[])
+            apply_decision(c,link_events(c,world_events),now)
+            c.pop('strategy_history',None)
             elapsed=max(0,now-(c.get('market_quote_at') or c.get('last_seen',0)))
             c['data_age_seconds']=int(elapsed)
             c['fresh']=elapsed<=LIVE_MAX_AGE_S

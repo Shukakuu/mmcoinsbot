@@ -17,7 +17,8 @@ from radar.live_launches import LaunchFeed
 from radar.realtime import compare_cohorts
 from radar.x_verification import XVerifier
 from radar.j7_hub import HighlightTracker
-from radar.world_watch import WorldMonitor, build_report, social_events
+from radar.world_watch import build_report, social_events
+from radar.world_intel import WorldIntel
 from radar.strategies import enforce_gate
 
 ROOT=Path(__file__).resolve().parent
@@ -80,13 +81,12 @@ def make_handler(radar, demo=False, j7=None, verifier=None, restart_callback=Non
         def do_GET(self):
             path=urlparse(self.path).path
             if path=='/api/data': return self.respond(demo_payload() if demo else radar.view())
+            if path=='/api/world':
+                return self.respond(world.report() if world and not demo else {'status':{'state':'demo' if demo else 'not_started'},'stories':[],'topics':[],'upcoming':[],'token_links':[],'manual_only':True})
             if path=='/api/v2':
                 now=time.time()
-                coins=demo_payload()['coins'] if demo else radar.view()['coins']
+                coins=demo_payload()['coins'] if demo else radar.view(now=now)['coins']
                 events=[] if demo else radar.store.world_events(now)+social_events(radar.store.recent_social(500),now)
-                if not demo:
-                    histories=radar.store.strategy_histories([c['mint'] for c in coins],now)
-                    for coin in coins:coin['strategy_history']=histories.get(coin['mint'],[])
                 data=build_report(coins,events,now)
                 data['demo']=demo
                 data['news_status']=world.status if world else {'state':'demo' if demo else 'not_started'}
@@ -189,7 +189,7 @@ def main():
     radar=None if args.demo else Radar(args.db,args.wallets,args.interval,args.limit,args.rpc)
     verifier=None if args.demo or args.once else XVerifier(radar.store,radar.social_wakeup)
     trends=None if args.demo or args.once else TrendsMonitor(radar.store,radar.stop_event)
-    world=None if args.demo or args.once else WorldMonitor(radar.store,radar.stop_event)
+    world=None if args.demo or args.once else WorldIntel(radar.store,radar.stop_event)
     j7=None if args.demo or args.once else J7Feed(radar.store,radar.social_wakeup,verifier=verifier)
     launches=None if args.demo or args.once else LaunchFeed(radar.store,radar.stop_event,radar.social_wakeup)
     if launches and args.no_launch_feed:

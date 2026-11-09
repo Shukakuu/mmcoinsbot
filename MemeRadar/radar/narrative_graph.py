@@ -4,6 +4,17 @@ from .narrative_intelligence import extract_phrases, clean_phrase
 from .narratives import normal
 
 
+def source_voice(source):
+    """Group publisher sections; this counts voices, not proven independence."""
+    value = str(source or '').strip()
+    if value.casefold().startswith('j7 @'):
+        return 'J7 @' + value[4:].casefold()
+    for publisher in ('BBC', 'Guardian', 'France 24', 'Google News'):
+        if value.casefold().startswith(publisher.casefold()):
+            return publisher
+    return value.casefold()
+
+
 def discover_terms(text):
     terms = extract_phrases(text)
     # Mixed-case names (SpaceX, DeepMind, etc.) need not be preconfigured.
@@ -21,7 +32,7 @@ def topic_graph(events):
             key = normal(term['term'])
             group = groups.setdefault(key, {'term': term['term'], 'events': [], 'sources': set(), 'related': {}})
             group['events'].append(event['id'])
-            group['sources'].add(event['source'])
+            group['sources'].add(source_voice(event['source']))
             for other in event['terms']:
                 if normal(other['term']) != key:
                     group['related'][other['term']] = group['related'].get(other['term'], 0)+1

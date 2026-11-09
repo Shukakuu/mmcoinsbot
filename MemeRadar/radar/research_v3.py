@@ -92,7 +92,9 @@ class ResearchV3:
                   'safety_summary','liquidity_usd','market_cap_usd','volume_m5_usd',
                   'pressure_buys_m5','pressure_sells_m5','change_m5_pct','score_method',
                   'curve_candidate','pre_impulse','early_watch','early_watch_evidence',
-                  'narrative_matches','priority_score','attention_score')}
+                  'narrative_matches','priority_score','attention_score',
+                  'analysis_version','decision_method','strategy_decisions',
+                  'security_gate','safety_checked_at','world_context')}
         with self.db() as db:
             for kind,cohort in kinds:
                 exists=db.execute('SELECT 1 FROM research_v3_events WHERE mint=? AND kind=? AND at>? LIMIT 1',

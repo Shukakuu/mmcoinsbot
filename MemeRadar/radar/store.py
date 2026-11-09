@@ -133,7 +133,8 @@ class Store(WorldStore, RealtimeStore, J7Hub, ResearchV3, ResearchV2, ResearchSt
         """Investigation candidates including clones; no implied endorsement."""
         from .social import is_solana_address
         from .narrative_intelligence import extract_phrases, topic_is_related
-        terms=[p['term'] for p in extract_phrases(headline)]
+        from .narrative_graph import discover_terms
+        terms=[p['term'] for p in discover_terms(headline)]
         if not terms:return []
         with self.read_db() as db:
             rows=db.execute('SELECT mint,name,symbol FROM coins ORDER BY last_seen DESC').fetchall()
